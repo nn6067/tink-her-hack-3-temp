@@ -2,38 +2,60 @@
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: [CODE MUSKETEERS]
 
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Member 1: [NITHYA S] - [AHALIA SCHOOL OF ENGINEERING AND TECHNOLOGY]
+- Member 2: [NANDANA R] - [AHALIA SCHOOL OF ENGINEERING AND TECHNOLOGY]
 
 ### Hosted Project Link
 [mention your project hosted project link here]
 
 ### Project Description
-[2-3 lines about what your project does]
+[Sentiment driven AI companion 
+An emotion aware AI chatbot that adapts its tone and responses based on a users detected mode. It integrates NLP, sentiment analysis and biometric data to provide personalised mental health support through text or voice conversations. ]
 
 ### The Problem statement
-[What ridiculous problem are you solving?]
+[Many people struggle with mental health challenges like stress, anxiety,  loneliness but lack immediate emotional support. Traditional therapy can be expensive and inaccessible, while existing chatbots lack real emotional awareness. ]
 
 ### The Solution
-[How are you solving it? Keep it fun!]
+[Our solution aims to bridge this gap by creating an AI companion that can understand, adapt and respond to users emotions in real time ]
 
 ## Technical Details
 ### Technologies/Components Used
-For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+for software:
+[HTML, CSS, JavaScript]
+[ Frontend: None (Pure HTML, CSS, JS)]
+[Backend: Flask (or FastAPI)]
+[Frontend: Axios (or Fetch API)]
+[Backend: Flask, JSON, Sentiment Analysis libraries (e.g., TextBlob, VADER)]
+[ Code Editor: VS Code, Sublime Text
+ Python: Python 3.x, pip/conda
+ Version Control: Git, GitHub/GitLab
+ Deployment: Heroku, AWS, Vercel]
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
+
+
+for hardware:
+
+
+ [Computer (Desktop/Laptop)
+ Internet Connection
+External Storage (optional)]
+
+*
+[ Processor: Intel i5 (or AMD equivalent)
+ RAM: 8GB+ (16GB recommended)
+ Storage: 256GB SSD+
+ OS: Windows]
+
+
+[ Code Editor: VS Code
+ Python 3.x, Git
+Browser: Chrome/Firefox
+ Virtual Environment: `venv` or `conda`]
+
 
 ### Implementation
 For Software:
@@ -79,7 +101,7 @@ For Hardware:
 ![Build](Add photos of build process here)
 *Explain the build steps*
 
-![Final](Add photo of final product here)
+![](Add photo of final product here)
 *Explain the final build*
 
 ### Project Demo

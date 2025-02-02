@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harbinger - Your Emotional Support AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            align-self: flex-end;
+            margin-left: 20%;
+        }
+
+        .ai-message {
+            background: #f5f5f5;
+            align-self: flex-start;
+            margin-right: 20%;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        textarea {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 0 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .emotion-indicator {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .bullet-list {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .bullet-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Harbinger</h1>
+            <p>Your Emotional Support Companion</p>
+        </header>
+        <div class="chat-container" id="chat-container">
+            <div class="message ai-message">
+                Hello! I'm Harbinger, your emotional support AI. I'm here to listen and help you through whatever you're experiencing. How are you feeling today?
+            </div>
+        </div>
+        <div class="input-container">
+            <textarea id="user-input" placeholder="Share your thoughts..."></textarea>
+            <button id="send-button">Send</button>
+        </div>
+        <div class="emotion-indicator" id="emotion-indicator">
+            Emotional State: Neutral
+        </div>
+    </div>
+
+    <script>
+        const emotionalKeywords = {
+            stress: {
+                keywords: ['stressed', 'stress', 'pressure', 'overwhelmed', 'burnout', 'burnt out'],
+                intensity: {
+                    high: ['really', 'very', 'so', 'extremely', 'completely', 'totally'],
+                    medium: ['quite', 'pretty', 'kind of', 'somewhat'],
+                    low: ['little', 'bit', 'slightly', 'mildly']
+                }
+            },
+            anxiety: {
+                keywords: ['anxious', 'anxiety', 'worried', 'nervous', 'panic', 'fear', 'scared'],
+                intensity: {
+                    high: ['severe', 'extreme', 'intense', 'overwhelming'],
+                    medium: ['moderate', 'noticeable'],
+                    low: ['mild', 'slight']
+                }
+            },
+            depression: {
+                keywords: ['depressed', 'depression', 'sad', 'down', 'hopeless', 'meaningless'],
+                intensity: {
+                    high: ['severely', 'deeply', 'extremely'],
+                    medium: ['moderately', 'quite'],
+                    low: ['mildly', 'slightly']
+                }
+            },
+            anger: {
+                keywords: ['angry', 'anger', 'mad', 'furious', 'frustrated', 'irritated'],
+                intensity: {
+                    high: ['furious', 'enraged', 'livid'],
+                    medium: ['angry', 'mad'],
+                    low: ['annoyed', 'irritated']
+                }
+            }
+        };
+
+        const responses = {
+            stress: {
+                high: {
+                    immediate: "I can hear that you're under intense stress right now. Let's take a moment to breathe together.",
+                    advice: [
+                        "Find a quiet space where you can be alone for a few minutes",
+                        "Try this breathing exercise: Inhale for 4 counts, hold for 4, exhale for 4",
+                        "Write down everything that's causing you stress - we can tackle them one by one",
+                        "Consider reaching out to a professional counselor or therapist",
+                        "Take a short walk if possible - physical movement can help reduce stress"
+                    ]
+                },
+                medium: {
+                    immediate: "I understand you're feeling stressed. Let's work on managing this together.",
+                    advice: [
+                        "Break down your tasks into smaller, manageable steps",
+                        "Take regular breaks using the Pomodoro technique",
+                        "Practice mindful breathing for 5 minutes",
+                        "Stay hydrated and maintain regular meals",
+                        "Try to get adequate sleep tonight"
+                    ]
+                },
+                low: {
+                    immediate: "I hear that you're feeling a bit stressed. It's good that you're addressing it early.",
+                    advice: [
+                        "Take a short break from what you're doing",
+                        "Do some light stretching",
+                        "Listen to calming music",
+                        "Practice gratitude by listing three positive things",
+                        "Consider a brief meditation session"
+                    ]
+                }
+            },
+            anxiety: {
+                high: {
+                    immediate: "I understand you're experiencing intense anxiety. Remember: this feeling will pass. Let's focus on grounding ourselves.",
+                    advice: [
+                        "Try the 5-4-3-2-1 technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste",
+                        "Focus on your breathing - take slow, deep breaths",
+                        "If you have prescribed medication for anxiety, consider taking it",
+                        "Call a trusted friend or family member",
+                        "If you feel overwhelmed, don't hesitate to contact emergency services"
+                    ]
+                },
+                medium: {
+                    immediate: "I hear that you're feeling anxious. Let's work on reducing these feelings together.",
+                    advice: [
+                        "Practice the 4-7-8 breathing technique",
+                        "Ground yourself by focusing on physical sensations",
+                        "Take a walk if possible",
+                        "Listen to calming music or nature sounds",
+                        "Write down your worries to get them out of your head"
+                    ]
+                },
+                low: {
+                    immediate: "I notice you're feeling a bit anxious. That's very normal, and we can work through this.",
+                    advice: [
+                        "Take a few deep breaths",
+                        "Drink some water or herbal tea",
+                        "Do some gentle stretching",
+                        "Practice mindfulness for a few minutes",
+                        "Consider what might be triggering these feelings"
+                    ]
+                }
+            },
+            depression: {
+                high: {
+                    immediate: "I hear the depth of what you're going through. Remember that you don't have to face this alone.",
+                    advice: [
+                        "Please consider reaching out to a mental health professional",
+                        "Contact a trusted friend or family member",
+                        "Remember that depression lies - your life has value",
+                        "Try to do one small self-care activity",
+                        "If you have thoughts of self-harm, please call emergency services or a crisis hotline"
+                    ]
+                },
+                medium: {
+                    immediate: "I understand you're feeling down. These feelings are valid, and there are ways to work through them.",
+                    advice: [
+                        "Try to maintain a regular daily routine",
+                        "Get some sunlight or fresh air if possible",
+                        "Do one small activity you usually enjoy",
+                        "Stay connected with supportive people",
+                        "Consider talking to a counselor or therapist"
+                    ]
+                },
+                low: {
+                    immediate: "I hear that you're feeling a bit down. It's good that you're expressing these feelings.",
+                    advice: [
+                        "Engage in a small activity you enjoy",
+                        "Try some light exercise",
+                        "Connect with a friend",
+                        "Practice self-care activities",
+                        "Consider journaling your thoughts"
+                    ]
+                }
+            },
+            anger: {
+                high: {
+                    immediate: "I can hear how angry you are. Let's focus on calming down safely before doing anything else.",
+                    advice: [
+                        "Find a safe space where you can cool down",
+                        "Take deep, slow breaths - count to 10 slowly",
+                        "If you feel like hitting something, try punching a pillow",
+                        "Write down your thoughts without censoring",
+                        "Consider stepping away from the situation temporarily"
+                    ]
+                },
+                medium: {
+                    immediate: "I understand you're feeling angry. Let's work through this together.",
+                    advice: [
+                        "Take a few deep breaths",
+                        "Try to identify what triggered this feeling",
+                        "Express your feelings without acting on them",
+                        "Go for a walk if possible",
+                        "Use 'I' statements when expressing your feelings"
+                    ]
+                },
+                low: {
+                    immediate: "I notice you're feeling frustrated. It's good to acknowledge these feelings.",
+                    advice: [
+                        "Take a short break from the situation",
+                        "Express your concerns calmly",
+                        "Try some deep breathing",
+                        "Consider if there's a constructive solution",
+                        "Focus on what you can control"
+                    ]
+                }
+            }
+        };
+
+        const strategies = {
+            emotionManagement: {
+                general: [
+                    "Practice mindfulness meditation for 10 minutes daily",
+                    "Keep a mood journal to track emotional patterns",
+                    "Use the RAIN technique: Recognize, Allow, Investigate, Nurture",
+                    "Practice progressive muscle relaxation",
+                    "Try box breathing: 4 seconds inhale, hold, exhale, hold"
+                ],
+                physical: [
+                    "Exercise for at least 30 minutes daily",
+                    "Get 7-9 hours of sleep regularly",
+                    "Maintain a balanced diet",
+                    "Stay hydrated throughout the day",
+                    "Take regular breaks to stretch and move"
+                ],
+                social: [
+                    "Connect with supportive friends or family",
+                    "Join support groups or community activities",
+                    "Practice active listening in conversations",
+                    "Set healthy boundaries in relationships",
+                    "Share feelings with trusted individuals"
+                ]
+            },
+            productiveActivities: {
+                creative: [
+                    "Start a DIY project",
+                    "Learn a musical instrument",
+                    "Try painting or drawing",
+                    "Write stories or poetry",
+                    "Take up photography"
+                ],
+                learning: [
+                    "Take an online course",
+                    "Learn a new language",
+                    "Read educational books",
+                    "Watch documentary films",
+                    "Practice coding or technical skills"
+                ],
+                physical: [
+                    "Join a sports team",
+                    "Try yoga or pilates",
+                    "Go hiking or cycling",
+                    "Take dance classes",
+                    "Start a home workout routine"
+                ],
+                relaxation: [
+                    "Practice gardening",
+                    "Try cooking new recipes",
+                    "Do puzzle games",
+                    "Listen to calming music",
+                    "Practice meditation or yoga"
+                ]
+            },
+            timeManagement: {
+                planning: [
+                    "Use the Pomodoro Technique (25 min work, 5 min break)",
+                    "Create daily to-do lists with priorities",
+                    "Plan your week in advance",
+                    "Set SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound)",
+                    "Use time-blocking for different activities"
+                ],
+                productivity: [
+                    "Break large tasks into smaller, manageable chunks",
+                    "Eliminate or minimize distractions",
+                    "Use the 2-minute rule: If it takes less than 2 minutes, do it now",
+                    "Batch similar tasks together",
+                    "Schedule regular breaks to maintain focus"
+                ],
+                habits: [
+                    "Create morning and evening routines",
+                    "Use habit stacking (link new habits to existing ones)",
+                    "Track your progress with habit trackers",
+                    "Start with small, achievable habits",
+                    "Reward yourself for maintaining good habits"
+                ]
+            }
+        };
+
+        const mixedEmotionResponses = {
+            general: {
+                acknowledgment: [
+                    "It's completely normal to experience multiple emotions at once. Our feelings aren't always simple or straightforward.",
+                    "Having mixed emotions is a very human experience. It shows you're processing complex situations thoughtfully.",
+                    "Feeling different emotions simultaneously is natural. Let's explore these feelings together."
+                ],
+                guidance: [
+                    "Let's take a moment to understand each emotion separately, then see how they interact.",
+                    "Sometimes mixed emotions signal that we're growing or processing important life changes.",
+                    "We can work through these feelings one at a time while acknowledging their interconnection."
+                ]
+            },
+            combinations: {
+                "happy_sad": {
+                    response: "Feeling both happy and sad is quite common, especially during times of change or transition. This might happen during graduations, moves, or life changes where you're excited for new beginnings while missing what you're leaving behind.",
+                    strategies: [
+                        "Write about both emotions in a journal to understand their sources",
+                        "Allow yourself to fully experience both feelings without judgment",
+                        "Share your mixed feelings with someone who understands",
+                        "Create a memory box to honor the past while looking forward",
+                        "Practice mindful acceptance of both emotions"
+                    ]
+                },
+                "angry_anxious": {
+                    response: "The combination of anger and anxiety often occurs when we feel threatened or overwhelmed. This is your body's way of preparing to both protect and be cautious.",
+                    strategies: [
+                        "Practice grounding techniques to center yourself",
+                        "Use physical exercise to release both emotions safely",
+                        "Write down what's triggering each emotion",
+                        "Try progressive muscle relaxation",
+                        "Alternate between calming and energetic activities"
+                    ]
+                },
+                "excited_nervous": {
+                    response: "Feeling excited and nervous together is very natural - they're actually closely related emotions that can stem from anticipating something important.",
+                    strategies: [
+                        "Channel the nervous energy into preparation",
+                        "Use positive visualization techniques",
+                        "Break down what you're facing into smaller steps",
+                        "Share your feelings with others who've had similar experiences",
+                        "Focus on the aspects you're excited about"
+                    ]
+                }
+            }
+        };
+
+        async function searchForEmotionalGuidance(emotions) {
+            try {
+                const searchQuery = `how to handle feeling ${emotions.join(' and ')} at the same time emotional advice`;
+                const searchResults = await fetch('https://api.bing.microsoft.com/v7.0/search', {
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': 'YOUR_API_KEY'
+                    },
+                    params: {
+                        q: searchQuery,
+                        count: 3
+                    }
+                });
+                return searchResults;
+            } catch (error) {
+                console.error('Search error:', error);
+                return null;
+            }
+        }
+
+        function getRandomStrategies(category, subcategory, count = 3) {
+            const items = strategies[category][subcategory];
+            const shuffled = items.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function detectEmotion(text) {
+            text = text.toLowerCase();
+            let detectedEmotions = [];
+
+            for (const [emotion, data] of Object.entries(emotionalKeywords)) {
+                const hasEmotion = data.keywords.some(keyword => text.includes(keyword));
+                
+                if (hasEmotion) {
+                    let intensity = 'medium';
+                    
+                    if (data.intensity.high.some(marker => text.includes(marker))) {
+                        intensity = 'high';
+                    }
+                    else if (data.intensity.low.some(marker => text.includes(marker))) {
+                        intensity = 'low';
+                    }
+
+                    detectedEmotions.push({
+                        type: emotion,
+                        intensity: intensity
+                    });
+                }
+            }
+
+            return detectedEmotions;
+        }
+
+        function handleMixedEmotions(emotions) {
+            // Sort emotions alphabetically to create consistent combination keys
+            const sortedEmotions = emotions.map(e => e.type).sort();
+            const combinationKey = sortedEmotions.join('_');
+            
+            // Get general acknowledgment and guidance
+            const acknowledgment = mixedEmotionResponses.general.acknowledgment[
+                Math.floor(Math.random() * mixedEmotionResponses.general.acknowledgment.length)
+            ];
+            const guidance = mixedEmotionResponses.general.guidance[
+                Math.floor(Math.random() * mixedEmotionResponses.general.guidance.length)
+            ];
+
+            // Check if we have specific guidance for this combination
+            const specificResponse = mixedEmotionResponses.combinations[combinationKey];
+            
+            let response = `${acknowledgment}\n\n${guidance}\n\n`;
+            
+            if (specificResponse) {
+                response += `${specificResponse.response}\n\nHere are some strategies for managing these mixed emotions:\n• ${specificResponse.strategies.join('\n• ')}\n\n`;
+            }
+
+            // Add individual emotion strategies
+            response += "Here are some specific strategies for each emotion you're feeling:\n\n";
+            
+            emotions.forEach(emotion => {
+                if (responses[emotion.type] && responses[emotion.type][emotion.intensity]) {
+                    const emotionResponse = responses[emotion.type][emotion.intensity];
+                    response += `For your ${emotion.type} feelings:\n• ${emotionResponse.advice.slice(0, 2).join('\n• ')}\n\n`;
+                }
+            });
+
+            // Add general coping strategies
+            const generalStrategies = getRandomStrategies('emotionManagement', 'general', 3);
+            response += `General coping strategies that might help:\n• ${generalStrategies.join('\n• ')}`;
+
+            return response;
+        }
+
+        function generateResponse(text) {
+            text = text.toLowerCase();
+            
+            // Detect emotions
+            const emotions = detectEmotion(text);
+            
+            // Handle mixed emotions (if multiple emotions detected)
+            if (emotions.length > 1) {
+                return handleMixedEmotions(emotions);
+            }
+
+            // Single emotion response
+            if (emotions.length === 1) {
+                const primaryEmotion = emotions[0];
+                if (responses[primaryEmotion.type] && responses[primaryEmotion.type][primaryEmotion.intensity]) {
+                    const response = responses[primaryEmotion.type][primaryEmotion.intensity];
+                    const emotionStrategies = getRandomStrategies('emotionManagement', 'general');
+                    const timeManagementTips = getRandomStrategies('timeManagement', 'planning');
+                    const activities = getRandomStrategies('productiveActivities', 'creative');
+                    
+                    return `${response.immediate}\n\nHere are some suggestions that might help:\n• ${response.advice.join('\n• ')}\n\nEmotional Management Strategies:\n• ${emotionStrategies.join('\n• ')}\n\nProductive Activities to Try:\n• ${activities.join('\n• ')}\n\nTime Management Tips:\n• ${timeManagementTips.join('\n• ')}`;
+                }
+            }
+
+            // Check for activity-related queries
+            if (text.includes('activity') || text.includes('activities') || text.includes('something to do')) {
+                const creative = getRandomStrategies('productiveActivities', 'creative');
+                const physical = getRandomStrategies('productiveActivities', 'physical');
+                const learning = getRandomStrategies('productiveActivities', 'learning');
+                return `Here are some engaging activities you might enjoy:\n\nCreative Activities:\n• ${creative.join('\n• ')}\n\nPhysical Activities:\n• ${physical.join('\n• ')}\n\nLearning Activities:\n• ${learning.join('\n• ')}\n\nWould you like to explore any of these options?`;
+            }
+
+            // Check for time management queries
+            if (text.includes('time') || text.includes('schedule') || text.includes('planning') || text.includes('organize')) {
+                const planning = getRandomStrategies('timeManagement', 'planning');
+                const productivity = getRandomStrategies('timeManagement', 'productivity');
+                const habits = getRandomStrategies('timeManagement', 'habits');
+                return `Here are some effective time management strategies:\n\nPlanning Tips:\n• ${planning.join('\n• ')}\n\nProductivity Techniques:\n• ${productivity.join('\n• ')}\n\nHabit Formation:\n• ${habits.join('\n• ')}\n\nWould you like to discuss any of these strategies in detail?`;
+            }
+
+            // Check for strategy or coping queries
+            if (text.includes('cope') || text.includes('strategy') || text.includes('manage') || text.includes('deal with')) {
+                const emotional = getRandomStrategies('emotionManagement', 'general');
+                const physical = getRandomStrategies('emotionManagement', 'physical');
+                const social = getRandomStrategies('emotionManagement', 'social');
+                return `Here are some helpful coping strategies:\n\nEmotional Strategies:\n• ${emotional.join('\n• ')}\n\nPhysical Well-being:\n• ${physical.join('\n• ')}\n\nSocial Support:\n• ${social.join('\n• ')}\n\nWould you like to explore any of these strategies further?`;
+            }
+
+            // Check for greetings
+            if (text.match(/^(hi|hello|hey|good morning|good afternoon|good evening)/)) {
+                return "Hello! I'm here to support you. How are you feeling today?";
+            }
+
+            // Check for gratitude
+            if (text.includes('thank')) {
+                return "You're welcome! I'm glad I could help. Is there anything else you'd like to talk about?";
+            }
+
+            // Check for specific topics
+            if (text.includes('work')) {
+                return "Work can be challenging. Would you like to talk about what's happening at work? I can help you explore solutions or just listen.";
+            }
+
+            if (text.includes('relationship') || text.includes('friend') || text.includes('partner')) {
+                return "Relationships can be complex. Would you like to share more about what's on your mind? I'm here to listen without judgment.";
+            }
+
+            if (text.includes('sleep') || text.includes('tired')) {
+                return "Rest is important for our wellbeing. Are you having trouble sleeping? I can suggest some relaxation techniques that might help.";
+            }
+
+            if (text.includes('motivation') || text.includes('goal')) {
+                return "Setting and pursuing goals can be challenging. Would you like to talk about what you're working towards? Sometimes breaking things down into smaller steps can help.";
+            }
+
+            if (text.includes('lonely') || text.includes('alone')) {
+                return "Feeling lonely is a very human experience. Would you like to talk about it? Sometimes sharing our feelings can help us feel more connected.";
+            }
+
+            // Check for questions
+            if (text.includes('?')) {
+                if (text.includes('how') && text.includes('you')) {
+                    return "I'm here and ready to listen and support you. How are you feeling today?";
+                }
+                if (text.includes('what') && text.includes('do')) {
+                    return "I can help you process your emotions, provide support, and suggest coping strategies. What would be most helpful for you right now?";
+                }
+                return "That's a good question. Could you tell me more about what's on your mind? I want to make sure I understand and provide the most helpful response.";
+            }
+
+            // Check for negative feelings without specific emotion words
+            const negativeWords = ['cant', "can't", 'difficult', 'hard', 'tough', 'struggling', 'problem'];
+            if (negativeWords.some(word => text.includes(word))) {
+                return "It sounds like you're facing some challenges. Would you like to talk about what's making things difficult? Sometimes talking through our problems can help us see them more clearly.";
+            }
+
+            // Check for positive statements
+            const positiveWords = ['happy', 'good', 'great', 'wonderful', 'excited', 'better'];
+            if (positiveWords.some(word => text.includes(word))) {
+                return "I'm glad to hear that! Would you like to share more about what's making you feel this way? Celebrating positive moments is important.";
+            }
+
+            // Check for uncertainty
+            const uncertaintyWords = ['maybe', 'perhaps', 'not sure', 'confused', 'don\'t know'];
+            if (uncertaintyWords.some(word => text.includes(word))) {
+                return "It's okay to feel uncertain. Would you like to explore what's causing this uncertainty? Sometimes talking it through can help bring clarity.";
+            }
+
+            // Check if it's a short response (less than 3 words)
+            if (text.split(' ').length < 3) {
+                return "I'd like to understand more about what you're experiencing. Could you share more about what's on your mind?";
+            }
+
+            // Default responses (randomly selected)
+            const defaultResponses = [
+                "I hear you. Would you like to tell me more about what's on your mind?",
+                "Thank you for sharing that with me. How long have you been feeling this way?",
+                "I'm here to support you. What would be most helpful for you right now?",
+                "Your feelings are valid. Would you like to explore this further?",
+                "I'm listening. Could you tell me more about what brought this up?",
+                "That sounds challenging. How can I best support you right now?",
+                "I appreciate you sharing this with me. What aspects would you like to focus on?",
+                "I'm here to help. Would you like to talk more about what you're experiencing?"
+            ];
+
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const emotionIndicator = document.getElementById('emotion-indicator');
+
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+                messageDiv.textContent = text;
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function handleUserInput() {
+                const text = userInput.value.trim();
+                if (!text) return;
+
+                addMessage(text, true);
+                userInput.value = '';
+
+                const response = generateResponse(text);
+                
+                // Update emotion indicator
+                const emotions = detectEmotion(text);
+                if (emotions.length > 0) {
+                    const emotionStates = emotions.map(e => `${e.type} (${e.intensity} intensity)`).join(', ');
+                    emotionIndicator.textContent = `Emotional State: ${emotionStates}`;
+                } else {
+                    emotionIndicator.textContent = 'Emotional State: Neutral';
+                }
+
+                addMessage(response, false);
+            }
+
+            sendButton.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleUserInput();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
